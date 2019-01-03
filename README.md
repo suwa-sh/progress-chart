@@ -17,13 +17,13 @@
 
 ## 実行環境
 
-- Google Sheet
+- Google Sheets
 
 ## 対応サービス
 
 ### ITS
 
-- Google Sheet での手動管理
+- Google Sheets での手動管理
 - GitHub issue
 - GitLab issue ※未実装
 - PivotalTracker ※未実装
