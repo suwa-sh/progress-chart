@@ -133,6 +133,7 @@ ListValues.prototype.setPoint = function(row, point) {
  */
 ListValues.prototype.insert = function(row, issue) {
   this.setId(row, issue.id);
+  this.setCreatedAt(row, issue.created_at);
   this.update(row, issue);
 }
 /*
@@ -141,7 +142,6 @@ ListValues.prototype.insert = function(row, issue) {
 ListValues.prototype.update = function(row, issue) {
   this.setMilestone(row, issue.milestone);
   this.setTitle(row, issue.title);
-  this.setCreatedAt(row, issue.created_at);
   this.setClosedAt(row, issue.closed_at);
   this.setPoint(row, issue.point);
 }
