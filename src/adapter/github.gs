@@ -1,8 +1,8 @@
 var GitHubAdapter = function(token, owner, repository, estimateLabelPrefix) {
-  notEmpty('GitHubAdapter.token', this.token);
-  notEmpty('GitHubAdapter.owner', this.owner);
-  notEmpty('GitHubAdapter.repository', this.repository);
-  notEmpty('GitHubAdapter.estimateLabelPrefix', this.estimateLabelPrefix);
+  notEmpty('GitHubAdapter.token', token);
+  notEmpty('GitHubAdapter.owner', owner);
+  notEmpty('GitHubAdapter.repository', repository);
+  notEmpty('GitHubAdapter.estimateLabelPrefix', estimateLabelPrefix);
 
   this.token = token;
   this.owner = owner;
