@@ -25,17 +25,18 @@ function distribute(settings) {
   /*
    * srcの値からexcludeシートへの追加を判定
    */
-  function isInsertExcludeSheet(issue) {
+  function isInsertExcludeSheet(excludePrefixes, issue) {
     // title prefix
     if (issue.title === "") return false;
   
-    for (var index in _excludeSrcTitlePrefixes){
-      var excludePrefix = _excludeSrcTitlePrefixes[index];
+    for (var index = 0; index < excludePrefixes.length; index++){
+      var excludePrefix = excludePrefixes[index];
       if (forwardMatch(issue.title, excludePrefix)) return true;
     }
     return false;
   }
   function forwardMatch(string, keyword) {
+    log_trace('-- forwardMatch(' + string + ', ' + keyword + ')');
     return string.substr(0, keyword.length) == keyword;
   }
 
@@ -46,7 +47,7 @@ function distribute(settings) {
   var chartStartDate = settings['chart.start_date'];
   var chartEndDate = settings['chart.end_date'];
   var ignoreCategories = settings['update.ignore_categories'];
-  var _excludeSrcTitlePrefixes = settings['update.exclude_src_title_prefixes'].replace(' ', '').split(',');
+  var excludeSrcTitlePrefixes = settings['update.exclude_src_title_prefixes'].replace(/ /g, '').split(',');
   
   // calcシートの調整
   new CalcValues().adjustRow(chartStartDate, chartEndDate);
@@ -78,7 +79,7 @@ function distribute(settings) {
     if (excludeListValues.updateWhenMatches(srcIssue)) { log_debug("-- UPDATE exclude id:" + srcIssue.id); continue; }
 
     // 無視リストに追加
-    if (isInsertExcludeSheet(srcIssue)) {
+    if (isInsertExcludeSheet(excludeSrcTitlePrefixes, srcIssue)) {
       excludeCount++;
       excludeListValues.insert(excludeListValues.length + excludeCount, srcIssue);
       log_debug("-- INSERT exclude id:" + srcIssue.id);
