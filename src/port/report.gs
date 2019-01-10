@@ -8,16 +8,14 @@ function report(settings) {
     return chartImage
   }
   
-  function getStateMessage(timestamp) {
+  function getStateMessage(timestamp, itsLink) {
     var calcValues = new CalcValues();
     var message = '';
     message += '■' + timestamp　+ ' 時点' + '\n';
-    message += '  - ' + 
-      calcValues.todayCount() + ' / ' + calcValues.dayCount() + ' 日目' + 
-      ': 残り ' + calcValues.remainDayRatio() + '\n';
-    message += '  - ' + 
-      calcValues.todaysCumulativeActual() + ' / ' + calcValues.totalEstimate() + ' ポイント完了' +
-      ': 残り ' + calcValues.todaysActualRemainRatio() + '\n';
+    message += '・期日　　：残り ' + calcValues.remainDayRatio()          + ' - ' + calcValues.todayCount() + ' / ' + calcValues.dayCount()                  + ' 日目' + '\n';
+    message += '・ポイント：残り ' + calcValues.todaysActualRemainRatio() + ' - ' + calcValues.todaysCumulativeActual() + ' / ' + calcValues.totalEstimate() + ' 完了' + '\n';
+    message += 'based on ' + itsLink + '\n';
+    message += 'reported by ' + SpreadsheetApp.getActive().getUrl() + '\n';
     return message;
   }
 
@@ -28,6 +26,7 @@ function report(settings) {
   var chartStartDate = settings['chart.start_date'];
   var chartEndDate = settings['chart.end_date'];
   var botToken = settings['slack.bot_token'];
+  var itsLink = settings['slack.its_link'];
   
   // calcシートの調整
   new CalcValues().adjustRow(chartStartDate, chartEndDate);
@@ -45,7 +44,8 @@ function report(settings) {
 
   title = 'Burndown Chart @' + timestamp;
   image = getChartImage(chartSheetName, burndownChartIndex);
-  adapter.postImage(channel, title, image, getStateMessage(timestamp));
+  var message = getStateMessage(timestamp, itsLink)
+  adapter.postImage(channel, title, image, message);
 
   title = 'Burnup Chart @' + timestamp;
   image = getChartImage(chartSheetName, burnupChartIndex);
