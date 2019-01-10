@@ -11,6 +11,9 @@
 
 - GitHub issue
 ![GitHub issue](docs/images/GitHub_issue.png)
+- Asana
+![Asana Kanban](docs/images/Asana_Kanban.png)
+![Asana](docs/images/Asana.png)
 - Slack
 ![Slack](docs/images/Slack.png)
 
@@ -25,9 +28,9 @@
 
 - Google Sheets での手動管理
 - GitHub issue
+- Asana
 - GitLab issue ※未実装
 - PivotalTracker ※未実装
-- Asana ※未実装
 
 ### チャット
 
@@ -38,6 +41,12 @@
 1. [スプレッドシートの最新バージョン](https://drive.google.com/drive/u/0/folders/16Ai4B_YIXrDRHjoPcNekkknA3mLU-sN7) をマイドライブにコピー
 2. settingsシートを記入
     - chartの描画期間（スプリント や クォーター など）
-    - ITS情報（api token や リポジトリ など）
+    - ITS情報（オーナー や リポジトリ など）
     - チャット情報（bot token や チャンネル など）
+2. ユーザープロパティを設定
+    - Google Sheets メニューバー.ツール > スクリプトエディタ
+    - スクリプトエディタ メニューバー.ファイル > プロジェクトのプロパティ
+    - プロジェクトのプロパティ > ユーザープロパティ
+        - progress-chart__its.token = ITS の API Token を追加
+        - progress-chart__slack.bot_token = SlackBot の  API Token を追加
 3. 【progress-chart】メニュー > Bulk
