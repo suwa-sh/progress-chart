@@ -170,6 +170,22 @@ ListValues.prototype.isIgnoreUpdate = function(index) {
 }
 
 
+/*
+ * シートにIssuesを反映
+ */
+ListValues.prototype.updateSheet = function(issues) {
+  // シートをクリア
+  this.sheetClear();
+
+  // シートに反映
+  for (var index = 0; index < issues.length; index++) {
+    var row = this.HEADER_ROW_COUNT + index + 1;
+    var issue = issues[index];
+    this.insert(row, issue);
+  }
+}
+
+
 
 //--------------------------------------------------------------------------------------------------
 // test

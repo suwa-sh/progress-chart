@@ -33,7 +33,7 @@ AsanaAdapter.prototype.getDeleteParams = function() {
 
 AsanaAdapter.prototype.getWorkspaceId = function() {
   var url = "https://app.asana.com/api/1.0/workspaces";
-  log_trace("request url:" + url); 
+  log_trace("request url:" + url + ', params:' + JSON.stringify(this.getGetParams())); 
   var response = JSON.parse(UrlFetchApp.fetch(url, this.getGetParams()));
   var workspaces = response.data;
   for (var index = 0; index < workspaces.length; index++) {
@@ -95,8 +95,8 @@ AsanaAdapter.prototype.getSections = function(queryString) {
 }
 */
 
-AsanaAdapter.prototype.getMilestone = function(taskId) {
-  log_trace('AsanaAdapter.getMilestone(' + taskId + ')');
+AsanaAdapter.prototype.getSection = function(taskId) {
+  log_trace('AsanaAdapter.getSection(' + taskId + ')');
   
   const DEFAULT_RETURN_VALUE = '';
   var url = "https://app.asana.com/api/1.0/tasks/" + taskId;
@@ -148,7 +148,7 @@ AsanaAdapter.prototype.find = function(queryString) {
       
       // TODO 個別にtasks endpointを実行しないと見れないので、後でmilestoneカラムだけ更新
       var milestone = '';
-//      var milestone = this.getMilestone(id);
+//      var milestone = this.getSection(id);
 
       var issue = new Issue(id, milestone, name, created_at, completed_at, point);
       issues.push(issue);
@@ -204,7 +204,7 @@ AsanaAdapter.prototype.find = function(queryString) {
 // test
 //--------------------------------------------------------------------------------------------------
 function test_AsanaAdapter() {
-  LOG_LOGLEVEL = LOG_LOGLEVEL_TRACE;
+  LOG_LEVEL = LOG_LEVEL_TRACE;
 
   var settings = settings_load();
 //  var settings = settings_load('settings - Sample Asana');
@@ -245,7 +245,7 @@ function test_AsanaAdapter() {
   log_debug('find() issues.length:'                    + adapter.find().length);
   log_debug('find(' + queryString + ') issues.length:' + adapter.find(queryString).length);
   
-  log_debug('getMilestone task指定 milestone:'    + adapter.getMilestone('971015144508699'));
-  log_debug('getMilestone section指定 milestone:' + adapter.getMilestone('964400583269077'));
+  log_debug('getSection task指定 milestone:'    + adapter.getSection('971015144508699'));
+  log_debug('getSection section指定 milestone:' + adapter.getSection('964400583269077'));
 
 }

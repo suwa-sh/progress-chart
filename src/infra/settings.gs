@@ -41,7 +41,7 @@ function settings_load(sheetName) {
 // test
 //--------------------------------------------------------------------------------------------------
 function test_settings() {
-  LOG_LOGLEVEL = LOG_LOGLEVEL_TRACE;
+  LOG_LEVEL = LOG_LEVEL_TRACE;
 
   var settings = settings_load();
   log_trace('default    settings: ' + JSON.stringify(settings));

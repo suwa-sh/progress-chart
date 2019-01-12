@@ -78,7 +78,7 @@ GitHubAdapter.prototype.find = function(queryString) {
 // test
 //--------------------------------------------------------------------------------------------------
 function test_GitHubAdapter() {
-  LOG_LOGLEVEL = LOG_LOGLEVEL_DEBUG;
+  LOG_LEVEL = LOG_LEVEL_DEBUG;
 
   var settings = settings_load('settings - Sample GitHub');
   var token = settings['its.token'];

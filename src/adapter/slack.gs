@@ -66,7 +66,7 @@ SlackAdapter.prototype.postImage = function(channel, title, image, message) {
 // test
 //--------------------------------------------------------------------------------------------------
 function test_SlackAdapter() {
-  LOG_LOGLEVEL = LOG_LOGLEVEL_TRACE;
+  LOG_LEVEL = LOG_LEVEL_TRACE;
 
   var settings = settings_load();
   var botToken = settings['slack.bot_token'];

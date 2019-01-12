@@ -113,7 +113,7 @@ function checkDistributeResult(settings) {
 // test
 //--------------------------------------------------------------------------------------------------
 function test_distribute() {
-  LOG_LOGLEVEL = LOG_LOGLEVEL_DEBUG;
+  LOG_LEVEL = LOG_LEVEL_DEBUG;
 
   var settings = settings_load();
   distribute(settings);

@@ -160,7 +160,7 @@ CalcValues.prototype._deleteRow = function(numRows) {
 // test
 //--------------------------------------------------------------------------------------------------
 function test_CalcValues() {
-  LOG_LOGLEVEL = LOG_LOGLEVEL_TRACE;
+  LOG_LEVEL = LOG_LEVEL_TRACE;
 
   var calcValues = new CalcValues();
   log_debug('シートのデータ長は？: ' + calcValues.length);
