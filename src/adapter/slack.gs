@@ -1,13 +1,7 @@
 var SlackAdapter = function(botToken) {
-  this.botToken = botToken;
-}
-
-SlackAdapter.prototype._validate = function() {
-  log_trace('SlackAdapter._validate start');
+  notEmpty('SlackAdapter.botToken', botToken);
   
-  notEmpty('SlackAdapter.botToken', this.botToken);
-
-  log_trace('SlackAdapter._validate end');
+  this.botToken = botToken;
 }
 
 
@@ -18,8 +12,6 @@ SlackAdapter.prototype._validate = function() {
  * @param message メッセージ
  */
 SlackAdapter.prototype.postMessage = function(channel, message){
-  this._validate();
-
   var url = 'https://slack.com/api/chat.postMessage';
 
   const payload = {
@@ -48,8 +40,6 @@ SlackAdapter.prototype.postMessage = function(channel, message){
  * @param message メッセージ
  */
 SlackAdapter.prototype.postImage = function(channel, title, image, message) {
-  this._validate();
-
   var url = 'https://slack.com/api/files.upload';
   
   var payload = {
