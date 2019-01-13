@@ -87,7 +87,7 @@ DistributePort.prototype._checkResult = function() {
   for (var index = 0; index < this.backlogSheet.length; index++) {
     if (this.backlogSheet.getPoint(index) !== "") { continue; }
     var row = index + 1;
-    throw new Error(this.backlogSheet.sheetname + " シート " + row + "行目 のissueに ポイント が設定されていません。 確認してください。");
+    throw new Error(this.backlogSheet.sheetname + " シート " + row + "行目に ポイント が設定されていません。 確認してください。");
   }
 }
 
