@@ -40,13 +40,7 @@
 
 1. [スプレッドシートの最新バージョン](https://drive.google.com/drive/u/0/folders/16Ai4B_YIXrDRHjoPcNekkknA3mLU-sN7) をマイドライブにコピー
 2. settingsシートを記入
-    - chartの描画期間（スプリント や クォーター など）
-    - ITS情報（オーナー や リポジトリ など）
-    - チャット情報（bot token や チャンネル など）
-2. ユーザープロパティを設定
-    - Google Sheets メニューバー.ツール > スクリプトエディタ
-    - スクリプトエディタ メニューバー.ファイル > プロジェクトのプロパティ
-    - プロジェクトのプロパティ > ユーザープロパティ
-        - progress-chart__its.token = ITS の API Token を追加
-        - progress-chart__slack.bot_token = SlackBot の  API Token を追加
+    - chartの描画期間（スプリント や クォーター などの期間を指定）
+    - ITS情報（オーナー や リポジトリ、認証情報 など）
+    - チャット情報（チャンネル や 投稿に含めるリンク、認証情報 など）
 3. 【progress-chart】メニュー > Bulk
