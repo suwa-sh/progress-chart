@@ -1,32 +1,31 @@
 /*
  * listシート
  */
-var ListValues = function(sheetname, ignoreCategories) {
+var ListSheet = function(sheetname, ignoreCategories) {
   this.HEADER_ROW_COUNT = 1;
 
   this.sheetname = sheetname;
   this.sheet = SpreadsheetApp.getActive().getSheetByName(sheetname);
   this.values;
   this.length;
-  this.ignoreCategories;
-  this.refresh(ignoreCategories);
+  this.ignoreCategories = ignoreCategories;
+
+  this.refresh();
 }
 
 /*
  * キャッシュ更新
  */
-ListValues.prototype.refresh = function(ignoreCategories) {
-  // キャッシュを更新
+ListSheet.prototype.refresh = function() {
   var values = this.sheet.getDataRange().getValues();
   this.values = values;
   this.length = values.length;
-  if (ignoreCategories != null) this.ignoreCategories = ignoreCategories.replace(' ', '').split(',');
 }
 
 /*
  * シート -> Issue
  */
-ListValues.prototype.parse = function(row) {
+ListSheet.prototype.parse = function(row) {
   function dateFormat(dateString) {
     // 2018-11-29T14:04:00.602+09:00 -> 2018-11-29
     if (dateString === "") return dateString;
@@ -47,7 +46,7 @@ ListValues.prototype.parse = function(row) {
 /*
  * シートクリア
  */
-ListValues.prototype.sheetClear = function() {
+ListSheet.prototype.sheetClear = function() {
   var beforeValues = this.sheet.getDataRange().getValues();
   var afterValues = [];
 
@@ -73,57 +72,57 @@ ListValues.prototype.sheetClear = function() {
 /*
  * シートの行データ
  */
-ListValues.prototype.getRow = function(row) {
+ListSheet.prototype.getRow = function(row) {
   return this.values[row];
 }
 
 /*
  * getter
  */
-ListValues.prototype.getCategory = function(row) {
+ListSheet.prototype.getCategory = function(row) {
   return this.values[row][0];
 }
-ListValues.prototype.getId = function(row) {
+ListSheet.prototype.getId = function(row) {
   return this.values[row][1];
 }
-ListValues.prototype.getMilestone = function(row) {
+ListSheet.prototype.getMilestone = function(row) {
   return this.values[row][2];
 }
-ListValues.prototype.getTitle = function(row) {
+ListSheet.prototype.getTitle = function(row) {
   return this.values[row][3];
 }
-ListValues.prototype.getCreatedAt = function(row) {
+ListSheet.prototype.getCreatedAt = function(row) {
   return this.values[row][4];
 }
-ListValues.prototype.getClosedAt = function(row) {
+ListSheet.prototype.getClosedAt = function(row) {
   return this.values[row][5];
 }
-ListValues.prototype.getPoint = function(row) {
+ListSheet.prototype.getPoint = function(row) {
   return this.values[row][6];
 }
 
 /*
  * setter
  */
-ListValues.prototype.setCategory = function(row, category) {
+ListSheet.prototype.setCategory = function(row, category) {
   this.sheet.getRange(row, 1).setValue(category);
 }
-ListValues.prototype.setId = function(row, id) {
+ListSheet.prototype.setId = function(row, id) {
   this.sheet.getRange(row, 2).setValue(id);
 }
-ListValues.prototype.setMilestone = function(row, milestone) {
+ListSheet.prototype.setMilestone = function(row, milestone) {
   this.sheet.getRange(row, 3).setValue(milestone);
 }
-ListValues.prototype.setTitle = function(row, title) {
+ListSheet.prototype.setTitle = function(row, title) {
   this.sheet.getRange(row, 4).setValue(title);
 }
-ListValues.prototype.setCreatedAt = function(row, created_at) {
+ListSheet.prototype.setCreatedAt = function(row, created_at) {
   this.sheet.getRange(row, 5).setValue(created_at);
 }
-ListValues.prototype.setClosedAt = function(row, closed_at) {
+ListSheet.prototype.setClosedAt = function(row, closed_at) {
   this.sheet.getRange(row, 6).setValue(closed_at);
 }
-ListValues.prototype.setPoint = function(row, point) {
+ListSheet.prototype.setPoint = function(row, point) {
   this.sheet.getRange(row, 7).setValue(point);
 }
 
@@ -131,7 +130,7 @@ ListValues.prototype.setPoint = function(row, point) {
 /*
  * Issue Object　-> listシート　追加
  */
-ListValues.prototype.insert = function(row, issue) {
+ListSheet.prototype.insert = function(row, issue) {
   this.setId(row, issue.id);
   this.setCreatedAt(row, issue.created_at);
   this.update(row, issue);
@@ -139,7 +138,7 @@ ListValues.prototype.insert = function(row, issue) {
 /*
  * Issue Object　-> listシート　更新
  */
-ListValues.prototype.update = function(row, issue) {
+ListSheet.prototype.update = function(row, issue) {
   this.setMilestone(row, issue.milestone);
   this.setTitle(row, issue.title);
   this.setClosedAt(row, issue.closed_at);
@@ -148,23 +147,24 @@ ListValues.prototype.update = function(row, issue) {
 /*
  * Issue Object　-> listシート　マッチするものがある場合のみ更新
  */
-ListValues.prototype.updateWhenMatches = function(issue) {
+ListSheet.prototype.updateWhenMatches = function(issue, ignoreCategories) {
+  // listシートの値から更新の除外を判定
+  function isIgnoreUpdate(ignoreCategories, category) {
+    if (isNull(ignoreCategories)) return false;
+    if (isEmpty(category)) return false;
+    
+    for (var index in ignoreCategories) {
+      var ignoreCategory = ignoreCategories[index];
+      if (ignoreCategory == category) return true;
+    }
+    return false;
+  }
+
   // 数値としてループ
   for (var index = 0; index < this.values.length; index++) {
     if (issue.id !== this.getId(index)) continue;
-    if (!this.isIgnoreUpdate(index)) this.update(index + 1, issue);
+    if (!isIgnoreUpdate(ignoreCategories, this.getCategory(index))) this.update(index + 1, issue);
     return true;
-  }
-  return false;
-}
-// listシートの値から更新の除外を判定
-ListValues.prototype.isIgnoreUpdate = function(index) {
-  // category
-  var category = this.getCategory(index);
-  if (category === "") return false;
-  for (var ignoreIndex in this.ignoreCategories) {
-    var ignoreValue = this.ignoreCategories[ignoreIndex];
-    if (ignoreValue == category) return true;
   }
   return false;
 }
@@ -173,7 +173,7 @@ ListValues.prototype.isIgnoreUpdate = function(index) {
 /*
  * シートにIssuesを反映
  */
-ListValues.prototype.updateSheet = function(issues) {
+ListSheet.prototype.updateSheet = function(issues) {
   // シートをクリア
   this.sheetClear();
 
@@ -190,12 +190,17 @@ ListValues.prototype.updateSheet = function(issues) {
 //--------------------------------------------------------------------------------------------------
 // test
 //--------------------------------------------------------------------------------------------------
-function test_ListValues() {
-  var listValues = new ListValues('__test__');
+function test_ListSheet() {
+  LOG_LEVEL = LOG_LEVEL_TRACE;
+  var listSheet = new ListSheet('__test__');
 
-  listValues = new ListValues('__test__', '__IGNORE__');
+  var ignoreCategories = [];
+  ignoreCategories.push('DEF1');
+  ignoreCategories.push('DEF2');
+  ignoreCategories.push('DEF3');
   
-  var settings = settings_load();
-  var ignoreCategories = settings['update.ignore_categories'];
-  listValues = new ListValues('__test__', ignoreCategories);
+  var issue = {};
+  issue.id = 'NOT_EXIST'
+  var isMatched = listSheet.updateWhenMatches(issue, ignoreCategories);
+  log_debug('isMatched:' + isMatched);
 }

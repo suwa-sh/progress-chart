@@ -1,7 +1,7 @@
 /*
  * calcシート
  */
-var CalcValues = function() {
+var CalcSheet = function() {
   this.HEADER_ROW_COUNT = 2;
 
   this.sheetname = 'calc'
@@ -14,7 +14,7 @@ var CalcValues = function() {
 /*
  * キャッシュ更新
  */
-CalcValues.prototype.refresh = function() {
+CalcSheet.prototype.refresh = function() {
   // キャッシュを更新
   var values = this.sheet.getDataRange().getValues();
   this.values = values;
@@ -22,26 +22,26 @@ CalcValues.prototype.refresh = function() {
 }
 
 
-CalcValues.prototype._dateFormat = function(dateString) {
+CalcSheet.prototype._dateFormat = function(dateString) {
   return Utilities.formatDate(new Date(dateString), 'Asia/Tokyo', 'yyyy-MM-dd');
 }
-CalcValues.prototype.getDate = function(row) {
+CalcSheet.prototype.getDate = function(row) {
   var dateString = this.values[row][0];
   return this._dateFormat(dateString);
 }
-CalcValues.prototype.getScheduledRemain = function(row) {
+CalcSheet.prototype.getScheduledRemain = function(row) {
   return this.values[row][4];
 }
-CalcValues.prototype.getActualRemain = function(row) {
+CalcSheet.prototype.getActualRemain = function(row) {
   return this.values[row][6];
 }
-CalcValues.prototype.getCumulativeActual = function(row) {
+CalcSheet.prototype.getCumulativeActual = function(row) {
   return this.values[row][9];
 }
 
 
 
-CalcValues.prototype.getTodayRow = function() {
+CalcSheet.prototype.getTodayRow = function() {
   var today = this.today();
   var row = 0;
   for (var index = 0; index < this.length; index++) {
@@ -54,71 +54,71 @@ CalcValues.prototype.getTodayRow = function() {
   return row;
 }
 
-CalcValues.prototype.today = function() {
+CalcSheet.prototype.today = function() {
   return Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy-MM-dd');
 }
 
-CalcValues.prototype.dayCount = function() {
+CalcSheet.prototype.dayCount = function() {
   return this.values.length - this.HEADER_ROW_COUNT;
 }
 
-CalcValues.prototype.elapsedDayCount = function() {
+CalcSheet.prototype.elapsedDayCount = function() {
   // 当日の行番号 - ヘッダー行数 -> 経過日数
   //   01/01 〜 01/31 の 01/03 -> 2日経過
   return this.getTodayRow() - this.HEADER_ROW_COUNT;
 }
 
-CalcValues.prototype.todayCount = function() {
+CalcSheet.prototype.todayCount = function() {
   // 経過日数 + 1 -> 当日の日数
   //   01/01 〜 01/31 の 01/03 -> 3日目
   return this.elapsedDayCount() + 1;
 }
 
-CalcValues.prototype.remainDayCount = function() {
+CalcSheet.prototype.remainDayCount = function() {
   // 期間日数 - 経過日数 -> 残日数
   //   01/01 〜 01/31 の 01/03 -> 残り29日
   return this.dayCount() - this.elapsedDayCount();
 }
 
-CalcValues.prototype.totalEstimate = function() {
+CalcSheet.prototype.totalEstimate = function() {
   // 1日目の残り = 予定のポイント合計
   //   行番号でアクセスするので、ヘッダー行数 = 1日目のデータ行番号
   return this.getScheduledRemain(this.HEADER_ROW_COUNT);
 }
 
-CalcValues.prototype.todaysCumulativeActual = function() {
+CalcSheet.prototype.todaysCumulativeActual = function() {
   // 当日の実績累計
   return this.getCumulativeActual(this.getTodayRow());
 }
 
-CalcValues.prototype.todaysActualRemain = function() {
+CalcSheet.prototype.todaysActualRemain = function() {
   // 当日の残り
   return this.getActualRemain(this.getTodayRow());
 }
 
 
-CalcValues.prototype._ratio = function(target, total) {
+CalcSheet.prototype._ratio = function(target, total) {
   return Math.round(target / total * 100) + '%';
 }
-CalcValues.prototype.elapsedDayRatio = function() {
+CalcSheet.prototype.elapsedDayRatio = function() {
   // 経過日数 %
   return this._ratio(this.elapsedDayCount(), this.dayCount());
 }
-CalcValues.prototype.remainDayRatio = function() {
+CalcSheet.prototype.remainDayRatio = function() {
   // 残日数 %
   return this._ratio(this.remainDayCount(), this.dayCount());
 }
-CalcValues.prototype.todaysCumulativeActualRatio = function() {
+CalcSheet.prototype.todaysCumulativeActualRatio = function() {
   // 当日の実績累計 %
   return this._ratio(this.todaysCumulativeActual(), this.totalEstimate());
 }
-CalcValues.prototype.todaysActualRemainRatio = function() {
+CalcSheet.prototype.todaysActualRemainRatio = function() {
   // 当日の残り %
   return this._ratio(this.todaysActualRemain(), this.totalEstimate());
 }
 
 
-CalcValues.prototype.adjustRow = function(startDateString, endDateString) {
+CalcSheet.prototype.adjustRow = function(startDateString, endDateString) {
   var startDate = new Date(startDateString);
   var endDate = new Date(endDateString);
   var diffMSec = endDate - startDate;
@@ -131,7 +131,7 @@ CalcValues.prototype.adjustRow = function(startDateString, endDateString) {
   if (asisDateDiff < dateDiff)  { this._addRow(dateDiff - asisDateDiff); return; }
   this._deleteRow(asisDateDiff - dateDiff);
 }
-CalcValues.prototype._addRow = function(numRows) {
+CalcSheet.prototype._addRow = function(numRows) {
   log_debug('_addRow numRows:' + numRows);
   // 最終行からcount分、行追加
   var lastRow = this.sheet.getLastRow();
@@ -147,7 +147,7 @@ CalcValues.prototype._addRow = function(numRows) {
   lastRowRange.copyTo(this.sheet.getActiveRange(), SpreadsheetApp.CopyPasteType.PASTE_NORMAL, false);
   beforeSheet.activate();
 }
-CalcValues.prototype._deleteRow = function(numRows) {
+CalcSheet.prototype._deleteRow = function(numRows) {
   log_debug('_deleteRow numRows:' + numRows);
   // 最終行からcount分、行削除
   var deleteStartRow = this.sheet.getLastRow() - numRows + 1;
@@ -159,26 +159,26 @@ CalcValues.prototype._deleteRow = function(numRows) {
 //--------------------------------------------------------------------------------------------------
 // test
 //--------------------------------------------------------------------------------------------------
-function test_CalcValues() {
+function test_CalcSheet() {
   LOG_LEVEL = LOG_LEVEL_TRACE;
 
-  var calcValues = new CalcValues();
-  log_debug('シートのデータ長は？: ' + calcValues.length);
-  log_debug('期間(日数): ' + calcValues.dayCount());
-  log_debug('今日は何日？: ' + calcValues.today());
-  log_debug('今日は何日目？: ' + calcValues.todayCount());
-  log_debug('経過日数: ' + calcValues.elapsedDayCount());
-  log_debug('経過日数 ratio: ' + calcValues.elapsedDayRatio());
-  log_debug('残り日数: ' + calcValues.remainDayCount());
-  log_debug('残り日数 ratio: ' + calcValues.remainDayRatio());
-  log_debug('予定ポイント合計: ' + calcValues.totalEstimate());
-  log_debug('実績ポイント累計: ' + calcValues.todaysCumulativeActual());
-  log_debug('実績ポイント累計 ratio: ' + calcValues.todaysCumulativeActualRatio());
-  log_debug('残りポイント: ' + calcValues.todaysActualRemain());
-  log_debug('残りポイント ratio: ' + calcValues.todaysActualRemainRatio());
+  var calcSheet = new CalcSheet();
+  log_debug('シートのデータ長は？: ' + calcSheet.length);
+  log_debug('期間(日数): ' + calcSheet.dayCount());
+  log_debug('今日は何日？: ' + calcSheet.today());
+  log_debug('今日は何日目？: ' + calcSheet.todayCount());
+  log_debug('経過日数: ' + calcSheet.elapsedDayCount());
+  log_debug('経過日数 ratio: ' + calcSheet.elapsedDayRatio());
+  log_debug('残り日数: ' + calcSheet.remainDayCount());
+  log_debug('残り日数 ratio: ' + calcSheet.remainDayRatio());
+  log_debug('予定ポイント合計: ' + calcSheet.totalEstimate());
+  log_debug('実績ポイント累計: ' + calcSheet.todaysCumulativeActual());
+  log_debug('実績ポイント累計 ratio: ' + calcSheet.todaysCumulativeActualRatio());
+  log_debug('残りポイント: ' + calcSheet.todaysActualRemain());
+  log_debug('残りポイント ratio: ' + calcSheet.todaysActualRemainRatio());
   
   var settings = settings_load();
   var startDateString = settings['chart.start_date'];
   var endDateString = settings['chart.end_date'];
-  calcValues.adjustRow(startDateString, endDateString);
+  calcSheet.adjustRow(startDateString, endDateString);
 }

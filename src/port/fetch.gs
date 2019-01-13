@@ -34,7 +34,7 @@ var FetchPort = function(itsType, token, owner, repository, estimatePrefix) {
       throw new Error('FetchPort.itsType ' + itsType + ' には対応していません。');
   }
   
-  this.sheet = new ListValues('[list] src');
+  this.sheet = new ListSheet('[list] src');
 }
 
 

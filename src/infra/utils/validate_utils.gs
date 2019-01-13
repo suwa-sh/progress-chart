@@ -1,9 +1,19 @@
+function isNull(value) {
+  if (value == null) return true;
+  return false;
+}
+
+function isEmpty(value) {
+  if (value == null || value === '') return true;
+  return false;
+}
+
 function notNull(name, value) {
-  if (value == null) throw new Error(name + ' が設定されていません。');
+  if (isNull(value)) throw new Error(name + ' が設定されていません。');
 }
 
 function notEmpty(name, value) {
-  if (value == null || value === '') throw new Error(name + ' が設定されていません。');
+  if (isEmpty(value)) throw new Error(name + ' が設定されていません。');
 }
 
 

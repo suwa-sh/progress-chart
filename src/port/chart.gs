@@ -1,5 +1,5 @@
 var ChartPort = function() {
-  this.calcSheet = new CalcValues();
+  this.calcSheet = new CalcSheet();
 }
 
 var AdjustCommand = function(startDate, endDate) {

@@ -9,11 +9,11 @@ function report(settings) {
   }
   
   function getStateMessage(timestamp, itsLink) {
-    var calcValues = new CalcValues();
+    var calcSheet = new CalcSheet()
     var message = '';
     message += '■' + timestamp　+ ' 時点' + '\n';
-    message += '・期日　　：残り ' + calcValues.remainDayRatio()          + ' - ' + calcValues.todayCount() + ' / ' + calcValues.dayCount()                  + ' 日目' + '\n';
-    message += '・ポイント：残り ' + calcValues.todaysActualRemainRatio() + ' - ' + calcValues.todaysCumulativeActual() + ' / ' + calcValues.totalEstimate() + ' 完了' + '\n';
+    message += '・期日　　：残り '  + calcSheet.remainDayRatio()          + ' - ' + calcSheet.todayCount() + ' / ' + calcSheet.dayCount()                  + ' 日目' + '\n';
+    message += '・ポイント：残り ' + calcSheet.todaysActualRemainRatio() + ' - ' + calcSheet.todaysCumulativeActual() + ' / ' + calcSheet.totalEstimate() + ' 完了' + '\n';
     message += 'based on ' + itsLink + '\n';
     message += 'reported by ' + SpreadsheetApp.getActive().getUrl() + '\n';
     return message;
@@ -23,13 +23,8 @@ function report(settings) {
   log_info("report start");
   
   // 設定読み込み
-  var chartStartDate = settings['chart.start_date'];
-  var chartEndDate = settings['chart.end_date'];
   var botToken = settings['slack.bot_token'];
   var itsLink = settings['slack.its_link'];
-  
-  // calcシートの調整
-  new CalcValues().adjustRow(chartStartDate, chartEndDate);
 
   var adapter = new SlackAdapter(botToken);
 
