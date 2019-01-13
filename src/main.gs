@@ -1,3 +1,7 @@
+var VERSION = 'v0.3.0';
+
+
+
 function onOpen() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var menus = [
