@@ -12,6 +12,8 @@ var SlackAdapter = function(botToken) {
  * @param message メッセージ
  */
 SlackAdapter.prototype.postMessage = function(channel, message){
+  log_trace('SlackAdapter.postMessage start');
+  
   var url = 'https://slack.com/api/chat.postMessage';
 
   const payload = {
@@ -25,9 +27,9 @@ SlackAdapter.prototype.postMessage = function(channel, message){
     "payload" : payload
   };
 
-  var response = UrlFetchApp.fetch(url, params);
-  // TODO response check
-  log_trace(JSON.stringify(response));
+  log_trace("request url:" + url); 
+  UrlFetchApp.fetch(url, params);
+  log_trace('SlackAdapter.postMessage end');
 }
 
 
@@ -40,6 +42,8 @@ SlackAdapter.prototype.postMessage = function(channel, message){
  * @param message メッセージ
  */
 SlackAdapter.prototype.postImage = function(channel, title, image, message) {
+  log_trace('SlackAdapter.postImage start');
+  
   var url = 'https://slack.com/api/files.upload';
   
   var payload = {
@@ -55,9 +59,9 @@ SlackAdapter.prototype.postImage = function(channel, title, image, message) {
     'payload': payload
   };
   
-  var response = UrlFetchApp.fetch(url, params);
-  // TODO response check
-  log_trace(JSON.stringify(response));
+  log_trace("request url:" + url); 
+  UrlFetchApp.fetch(url, params);
+  log_trace('SlackAdapter.postImage end');
 }
 
 
@@ -68,17 +72,18 @@ SlackAdapter.prototype.postImage = function(channel, title, image, message) {
 function test_SlackAdapter() {
   LOG_LEVEL = LOG_LEVEL_TRACE;
 
-  var settings = settings_load();
-  var botToken = settings['slack.bot_token'];
+  var botToken = UserProperties.getProperty('SlackBotToken_Private');
+
+  try {
+    new SlackAdapter();
+    throw new Error('fail');
+  } catch(e) { log_debug('error message:' + e); }
+  
   var adapter = new SlackAdapter(botToken);
 
   var channel = '#random';
-  var message;
-  message = 'test slack_postMessage \npattern: english'
-  adapter.postMessage(channel, message);
-
-  message = 'test slack_postMessage \npattern: 日本語'
-  adapter.postMessage(channel, message);
+  adapter.postMessage(channel, 'test slack_postMessage \npattern: english');
+  adapter.postMessage(channel, 'test slack_postMessage \npattern: 日本語');
   
 
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('__test_slack_postImage__');
@@ -86,7 +91,5 @@ function test_SlackAdapter() {
   var charts = sheet.getCharts();
   var chartImage = charts[0].getBlob().getAs('image/png').setName("chart.png");
   adapter.postImage(channel, title, chartImage);
-
-  message = 'test slack_postImage \npattern: chart + メッセージ'
-  adapter.postImage(channel, title, chartImage, message);
+  adapter.postImage(channel, title, chartImage, 'test slack_postImage \npattern: chart + メッセージ');
 }

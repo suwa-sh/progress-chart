@@ -10,9 +10,9 @@ var AsanaAdapter = function(token, workspace, project, estimateTagPrefix) {
   this.estimateTagPrefix = estimateTagPrefix;
   
   this.auth = { "Authorization" : "Bearer " + this.token };
-  this.workspaceId = this.getWorkspaceId();
-  this.projectId = this.getProjectId();
-  this.tags = this.getTags();
+  this.workspaceId = this._getWorkspaceId();
+  this.projectId = this._getProjectId();
+  this.tags = this._getTags();
 
   log_trace("AsanaAdapter:" + JSON.stringify(this)); 
 }
@@ -31,7 +31,7 @@ AsanaAdapter.prototype.getDeleteParams = function() {
   return { "method" : "delete", "contentType" : "application/json", "headers" : this.auth };
 }
 
-AsanaAdapter.prototype.getWorkspaceId = function() {
+AsanaAdapter.prototype._getWorkspaceId = function() {
   var url = "https://app.asana.com/api/1.0/workspaces";
   log_trace("request url:" + url + ', params:' + JSON.stringify(this.getGetParams())); 
   var response = JSON.parse(UrlFetchApp.fetch(url, this.getGetParams()));
@@ -40,9 +40,11 @@ AsanaAdapter.prototype.getWorkspaceId = function() {
     var workspace = workspaces[index];
     if (workspace.name === this.workspace) return workspace.gid;
   }
+  
+  throw new Error("workspace id が取得できません。 name:" + workspace.name);
 }
 
-AsanaAdapter.prototype.getProjectId = function() {
+AsanaAdapter.prototype._getProjectId = function() {
   var url = "https://app.asana.com/api/1.0/workspaces/" + this.workspaceId + "/projects";
   log_trace("request url:" + url); 
   var response = JSON.parse(UrlFetchApp.fetch(url, this.getGetParams()));
@@ -51,11 +53,11 @@ AsanaAdapter.prototype.getProjectId = function() {
     var project = projects[index];
     if (project.name === this.project) return project.gid;
   }
+  
+  throw new Error("project id が取得できません。 name:" + project.name);
 }
 
-AsanaAdapter.prototype.getTags = function() {
-  log_trace('AsanaAdapter.getTags start');
-  
+AsanaAdapter.prototype._getTags = function() {
   var url = "https://app.asana.com/api/1.0/workspaces/" + this.workspaceId + "/tags";
   log_trace("request url:" + url); 
   var response = JSON.parse(UrlFetchApp.fetch(url, this.getGetParams()));
@@ -65,7 +67,6 @@ AsanaAdapter.prototype.getTags = function() {
     tags.push(asanaTags[index]);
   }
 
-  log_trace('AsanaAdapter.getTags end tags:' + JSON.stringify(tags));
   return tags;
 }
 
@@ -95,9 +96,7 @@ AsanaAdapter.prototype.getSections = function(queryString) {
 }
 */
 
-AsanaAdapter.prototype.getSection = function(taskId) {
-  log_trace('AsanaAdapter.getSection(' + taskId + ')');
-  
+AsanaAdapter.prototype._getSection = function(taskId) {
   const DEFAULT_RETURN_VALUE = '';
   var url = "https://app.asana.com/api/1.0/tasks/" + taskId;
   log_trace("-- request url:" + url); 
@@ -124,7 +123,7 @@ AsanaAdapter.prototype.getSection = function(taskId) {
     var section = membership.section;
     if (section == null) return DEFAULT_RETURN_VALUE;
     
-    log_trace("---- section:" + section); 
+    log_trace("---- section:" + JSON.stringify(section)); 
     return section.name;
   }
 }
@@ -145,10 +144,7 @@ AsanaAdapter.prototype.find = function(queryString) {
       var created_at = asanaTask["created_at"];
       var completed_at = asanaTask["completed_at"];
       var point = getPoint(allTags, asanaTask['tags'], estimateTagPrefix);
-      
-      // TODO 個別にtasks endpointを実行しないと見れないので、後でmilestoneカラムだけ更新
       var milestone = '';
-//      var milestone = this.getSection(id);
 
       var issue = new Issue(id, milestone, name, created_at, completed_at, point);
       issues.push(issue);
@@ -179,7 +175,8 @@ AsanaAdapter.prototype.find = function(queryString) {
 
 
 
-  var url = "https://app.asana.com/api/1.0/projects/" + this.projectId + "/tasks?opt_fields=name,resource_type,resource_subtype,tags,created_at,completed_at&limit=100";
+  var url = "https://app.asana.com/api/1.0/projects/" + this.projectId + 
+    "/tasks?opt_fields=name,resource_type,resource_subtype,tags,created_at,completed_at&limit=100";
   if (queryString != null) url += '&' + queryString;
 
   var issues = [];
@@ -194,6 +191,11 @@ AsanaAdapter.prototype.find = function(queryString) {
     url = nextPage.uri;
   }
 
+  // TODO 非同期で実行したい
+  for (var index = 0; index < issues.length; index++) {
+    issues[index].milestone = this._getSection(issues[index].id);
+  }
+
   log_trace('AsanaAdapter.find end');
   return issues;
 }
@@ -204,48 +206,36 @@ AsanaAdapter.prototype.find = function(queryString) {
 // test
 //--------------------------------------------------------------------------------------------------
 function test_AsanaAdapter() {
-  LOG_LEVEL = LOG_LEVEL_TRACE;
+  LOG_LEVEL = LOG_LEVEL_DEBUG;
 
-  var settings = settings_load();
-//  var settings = settings_load('settings - Sample Asana');
-
-  var token = settings['its.token'];
-  var owner = settings['its.owner'];
-  var repository = settings['its.repository'];
-  var estimateLabelPrefix = settings['its.estimate_label_prefix'];
-  var queryString = settings['its.query_string'];
+  var token = UserProperties.getProperty('AsanaToken');
+  var workspace = 'sample';
+  var project = 'Backlog';
+  var estimateTagPrefix = '+';
 
   try {
     new AsanaAdapter();
-  } catch(e) {
-    log_debug('error message:' + e);
-  }
+    throw new Error('fail');
+  } catch(e) { log_debug('error message:' + e); }
 
   try {
     new AsanaAdapter(token);
-  } catch(e) {
-    log_debug('error message:' + e);
-  }
+    throw new Error('fail');
+  } catch(e) { log_debug('error message:' + e); }
 
   try {
-    new AsanaAdapter(token, owner);
-  } catch(e) {
-    log_debug('error message:' + e);
-  }
+    new AsanaAdapter(token, workspace);
+    throw new Error('fail');
+  } catch(e) { log_debug('error message:' + e); }
 
   try {
-    new AsanaAdapter(token, owner, repository);
-  } catch(e) {
-    log_debug('error message:' + e);
-  }
+    new AsanaAdapter(token, workspace, project);
+    throw new Error('fail');
+  } catch(e) { log_debug('error message:' + e); }
 
-  var adapter;
-  adapter = new AsanaAdapter(token, owner, repository, estimateLabelPrefix);
-
+  var adapter = new AsanaAdapter(token, workspace, project, estimateTagPrefix);
+  var queryString = 'modified_since=9999-01-01T00:00:00Z';
+  
   log_debug('find() issues.length:'                    + adapter.find().length);
   log_debug('find(' + queryString + ') issues.length:' + adapter.find(queryString).length);
-  
-  log_debug('getSection task指定 milestone:'    + adapter.getSection('971015144508699'));
-  log_debug('getSection section指定 milestone:' + adapter.getSection('964400583269077'));
-
 }

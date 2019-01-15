@@ -80,42 +80,34 @@ GitHubAdapter.prototype.find = function(queryString) {
 function test_GitHubAdapter() {
   LOG_LEVEL = LOG_LEVEL_DEBUG;
 
-  var settings = settings_load('settings - Sample GitHub');
-  var token = settings['its.token'];
-  var owner = settings['its.owner'];
-  var repository = settings['its.repository'];
-  var estimateLabelPrefix = settings['its.estimate_label_prefix'];
-  var queryString = settings['its.query_string'];
+  var token = UserProperties.getProperty('GitHubToken');
+  var owner = 'suwa-sh';
+  var repository = 'progress-chart';
+  var estimateLabelPrefix = '+';
 
   try {
-    adapter = new GitHubAdapter();
-  } catch(e) {
-    log_debug('error message:' + e);
-  }
+    new GitHubAdapter();
+    throw new Error('fail');
+  } catch(e) { log_debug('error message:' + e); }
 
   try {
-    adapter = new GitHubAdapter(token);
-  } catch(e) {
-    log_debug('error message:' + e);
-  }
+    new GitHubAdapter(token);
+    throw new Error('fail');
+  } catch(e) { log_debug('error message:' + e); }
 
   try {
-    adapter = new GitHubAdapter(token, owner);
-  } catch(e) {
-    log_debug('error message:' + e);
-  }
+    new GitHubAdapter(token, owner);
+    throw new Error('fail');
+  } catch(e) { log_debug('error message:' + e); }
 
   try {
-    adapter = new GitHubAdapter(token, owner, repository);
-  } catch(e) {
-    log_debug('error message:' + e);
-  }
+    new GitHubAdapter(token, owner, repository);
+    throw new Error('fail');
+  } catch(e) { log_debug('error message:' + e); }
 
-  var adapter;
-  adapter = new GitHubAdapter(token, owner, repository, estimateLabelPrefix);
-  var issues = adapter.find();
-  log_debug('find() issues.length:' + issues.length);
-  
-  issues = adapter.find(queryString);
-  log_debug('find(' + queryString + ') issues.length:' + issues.length);
+  var adapter = new GitHubAdapter(token, owner, repository, estimateLabelPrefix);
+  var queryString = 'state=all&sort=created&direction=asc&since=9999-01-01T00:00:00Z';
+
+  log_debug('find() issues.length:'                    + adapter.find().length);
+  log_debug('find(' + queryString + ') issues.length:' + adapter.find(queryString).length);
 }
