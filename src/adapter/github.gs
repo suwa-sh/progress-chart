@@ -49,16 +49,28 @@ GitHubAdapter.prototype.find = function(queryString) {
     }
   }
 
+  var apiUrl = 'https://api.github.com/repos/' + this.owner + '/' + this.repository + '/issues';
+  if (queryString != null) apiUrl += '?' + queryString;
 
-  var apiUrl = 'https://api.github.com/repos/' + this.owner + '/' + this.repository + '/issues' + '?access_token=' + this.token;
-  if (queryString != null) apiUrl += '&' + queryString;
+  var headers = {
+    'Authorization': 'token ' + this.token,
+//    'Accept': 'application/vnd.github.v3+json'
+  };
+  var options = {
+     "method" : "get",
+     "headers" : headers,
+//     "muteHttpExceptions": false
+  };
 
   var issues = [];
   var page = 1;
   while (true) {
-    var url = apiUrl + '&page=' + page;
+    var delim = '?';
+    if (queryString != null) delim = '&';
+
+    var url = apiUrl + delim +'page=' + page;
     log_trace("request url:" + url); 
-    var response = UrlFetchApp.fetch(url);
+    var response = UrlFetchApp.fetch(url, options);
     // TODO check response
     var githubIssues = JSON.parse(response);
 
@@ -80,34 +92,42 @@ GitHubAdapter.prototype.find = function(queryString) {
 function test_GitHubAdapter() {
   LOG_LEVEL = LOG_LEVEL_DEBUG;
 
-  var token = UserProperties.getProperty('GitHubToken');
-  var owner = 'suwa-sh';
-  var repository = 'progress-chart';
-  var estimateLabelPrefix = '+';
+  var settings = settings_load('settings - Sample GitHub');
+  var token = settings['its.token'];
+  var owner = settings['its.owner'];
+  var repository = settings['its.repository'];
+  var estimateLabelPrefix = settings['its.estimate_label_prefix'];
+  var queryString = settings['its.query_string'];
 
   try {
-    new GitHubAdapter();
-    throw new Error('fail');
-  } catch(e) { log_debug('error message:' + e); }
+    adapter = new GitHubAdapter();
+  } catch(e) {
+    log_debug('error message:' + e);
+  }
 
   try {
-    new GitHubAdapter(token);
-    throw new Error('fail');
-  } catch(e) { log_debug('error message:' + e); }
+    adapter = new GitHubAdapter(token);
+  } catch(e) {
+    log_debug('error message:' + e);
+  }
 
   try {
-    new GitHubAdapter(token, owner);
-    throw new Error('fail');
-  } catch(e) { log_debug('error message:' + e); }
+    adapter = new GitHubAdapter(token, owner);
+  } catch(e) {
+    log_debug('error message:' + e);
+  }
 
   try {
-    new GitHubAdapter(token, owner, repository);
-    throw new Error('fail');
-  } catch(e) { log_debug('error message:' + e); }
+    adapter = new GitHubAdapter(token, owner, repository);
+  } catch(e) {
+    log_debug('error message:' + e);
+  }
 
-  var adapter = new GitHubAdapter(token, owner, repository, estimateLabelPrefix);
-  var queryString = 'state=all&sort=created&direction=asc&since=9999-01-01T00:00:00Z';
-
-  log_debug('find() issues.length:'                    + adapter.find().length);
-  log_debug('find(' + queryString + ') issues.length:' + adapter.find(queryString).length);
+  var adapter;
+  adapter = new GitHubAdapter(token, owner, repository, estimateLabelPrefix);
+  var issues = adapter.find();
+  log_debug('find() issues.length:' + issues.length);
+  
+  issues = adapter.find(queryString);
+  log_debug('find(' + queryString + ') issues.length:' + issues.length);
 }

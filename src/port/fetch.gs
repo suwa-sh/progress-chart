@@ -20,6 +20,9 @@ var FetchPort = function(itsType, token, owner, repository, estimatePrefix) {
   this.adapter;
   switch(itsType) {
     case this.ITSTYPE_MANUAL:
+    // TODO 未実装
+    case this.ITSTYPE_GITLAB:
+    case this.ITSTYPE_PIVOTALTRACKER:
       break;
     case this.ITSTYPE_GITHUB:
       this.adapter = new GitHubAdapter(this.token, this.owner, this.repository, this.estimatePrefix);
@@ -27,8 +30,6 @@ var FetchPort = function(itsType, token, owner, repository, estimatePrefix) {
     case this.ITSTYPE_ASANA:
       this.adapter = new AsanaAdapter(this.token, this.owner, this.repository, this.estimatePrefix);
       break;
-//    case this.ITSTYPE_GITLAB:
-//    case this.ITSTYPE_PIVOTALTRACKER:
     default:
       throw new Error('FetchPort.itsType ' + itsType + ' には対応していません。');
   }
@@ -38,6 +39,8 @@ var FetchPort = function(itsType, token, owner, repository, estimatePrefix) {
 
 
 var FetchCommand = function(queryString) {
+  // queryString 未設定の場合、全件検索
+  
   this.queryString = queryString;
 }
 
@@ -54,9 +57,17 @@ FetchPort.prototype.fetch = function(command) {
 
 
 FetchPort.prototype._delegateFetch = function(command) {
-  if (this.itsType === this.ITSTYPE_MANUAL) return null;
+  if (command.itsType === this.ITSTYPE_MANUAL) return null;
 
   var issues = this.adapter.find(command.queryString);
+  
+  if (command.itsType === this.ITSTYPE_ASANA) {
+    // milestoneの取得
+    for (var index = 0; index < issues.length; index++) {
+      // TODO 非同期で実行したい
+      issue.milestone = adapter.getSection(issues[index].id);
+    }
+  }
 
   return issues;
 }

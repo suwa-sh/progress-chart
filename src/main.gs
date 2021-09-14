@@ -1,4 +1,4 @@
-var VERSION = 'v0.3.0';
+var VERSION = 'v0.3.1';
 
 
 
@@ -18,15 +18,15 @@ function onOpen() {
 function mainFetch() {
   // 設定取得
   var settings = settings_load();
-  LOG_LEVEL          = settings['loglevel'];
-  var startDate      = settings['chart.start_date'];
-  var endDate        = settings['chart.end_date'];
-  var itsType        = settings['its.type'];
-  var token          = settings['its.token'];
-  var owner          = settings['its.owner'];
-  var repository     = settings['its.repository'];
+  LOG_LEVEL = settings['loglevel'];
+  var startDate = settings['chart.start_date'];
+  var endDate = settings['chart.end_date'];
+  var itsType = settings['its.type'];
+  var token = settings['its.token'];
+  var owner = settings['its.owner'];
+  var repository = settings['its.repository'];
   var estimatePrefix = settings['its.estimate_label_prefix'];
-  var queryString    = settings['its.query_string'];
+  var queryString = settings['its.query_string'];
   
   try {
     // chartの調整
@@ -48,10 +48,10 @@ function mainFetch() {
 function mainDistribute() {
   // 設定取得
   var settings = settings_load();
-  LOG_LEVEL                   = settings['loglevel'];
-  var startDate               = settings['chart.start_date'];
-  var endDate                 = settings['chart.end_date'];
-  var ignoreCategoriesDef     = settings['update.ignore_categories'];
+  LOG_LEVEL = settings['loglevel'];
+  var startDate = settings['chart.start_date'];
+  var endDate = settings['chart.end_date'];
+  var ignoreCategoriesDef = settings['update.ignore_categories'];
   var excludeTitlePrefixesDef = settings['update.exclude_src_title_prefixes'];
 
   try {
@@ -73,10 +73,10 @@ function mainDistribute() {
 function mainReport() {
   // 設定取得
   var settings = settings_load();
-  LOG_LEVEL         = settings['loglevel'];
-  var startDate     = settings['chart.start_date'];
-  var endDate       = settings['chart.end_date'];
-  var reportToken   = settings['slack.bot_token'];
+  LOG_LEVEL = settings['loglevel'];
+  var startDate = settings['chart.start_date'];
+  var endDate = settings['chart.end_date'];
+  var reportToken = settings['slack.bot_token'];
   var reportChannel = settings['slack.channel'];
   var reportItsLink = settings['slack.its_link'];
 
@@ -99,20 +99,20 @@ function mainReport() {
 function mainBulk() {
   // 設定取得
   var settings = settings_load();
-  LOG_LEVEL                   = settings['loglevel'];
-  var startDate               = settings['chart.start_date'];
-  var endDate                 = settings['chart.end_date'];
-  var itsType                 = settings['its.type'];
-  var token                   = settings['its.token'];
-  var owner                   = settings['its.owner'];
-  var repository              = settings['its.repository'];
-  var estimatePrefix          = settings['its.estimate_label_prefix'];
-  var queryString             = settings['its.query_string'];
-  var ignoreCategoriesDef     = settings['update.ignore_categories'];
+  LOG_LEVEL = settings['loglevel'];
+  var startDate = settings['chart.start_date'];
+  var endDate = settings['chart.end_date'];
+  var itsType = settings['its.type'];
+  var token = settings['its.token'];
+  var owner = settings['its.owner'];
+  var repository = settings['its.repository'];
+  var estimatePrefix = settings['its.estimate_label_prefix'];
+  var queryString = settings['its.query_string'];
+  var ignoreCategoriesDef = settings['update.ignore_categories'];
   var excludeTitlePrefixesDef = settings['update.exclude_src_title_prefixes'];
-  var reportToken             = settings['slack.bot_token'];
-  var reportChannel           = settings['slack.channel'];
-  var reportItsLink           = settings['slack.its_link'];
+  var reportToken = settings['slack.bot_token'];
+  var reportChannel = settings['slack.channel'];
+  var reportItsLink = settings['slack.its_link'];
 
   try {
     // chartの調整
